@@ -45,7 +45,10 @@
 %\usetheme{Szeged}
 %\usetheme{Warsaw}
 
+\usepackage{amsmath}
+
 \newcommand{\reels}{\mathbb{R}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 
 \title{Autoencoder a dimension reduction tool}
 
@@ -59,13 +62,6 @@
 % - Either use conference name or its abbreviation.
 % - Not really informative to the audience, more for people (including
 %   yourself) who are reading the slides online
-
-\AtBeginSubsection[]
-{
-  \begin{frame}<beamer>{Outline}
-    \tableofcontents[currentsection,currentsubsection]
-  \end{frame}
-}
 
 % Let's get started
 \begin{document}
@@ -86,7 +82,12 @@
 \subsection{Dimensionality reduction}
 
 \begin{frame}{Dimensionality reduction}{Optional Subtitle}
-    Reducing Dimensionality can resolve:
+    Reducing dimensionality has several applications:
+    \begin{itemize}
+	    \item compressing data
+	    \item coping with dimensionality curse
+            \item denoising
+    \end{itemize}
 \end{frame}
 
 \subsection{The PCA case}
@@ -94,7 +95,7 @@
     Let's $M$ a ${N, d}$ matrix  of N vector $\in \reels^{d}$\\
     We wan't to find a projection base of subspace where variance of M is maximal \\
     $\hat{M}$ is the centred, normalized matrix of M \\
-    $\hat{M}$ is diagonalizable thus $\hat{M} = P^{t}.\Delta.P$ \\
+    $\hat{M}.\hat{M}'$ is diagonalizable thus $\hat{M}.\hat{M}' = P^{t}.\Delta.P$ \\
     $\Delta$ contains eigen vectors and P is the projection matrix for its eigenspace \\
     We only keep the eigen vectors that explain the most of the variance of M. \\
 \end{frame}
@@ -105,21 +106,22 @@
     \begin{minipage}{6in}
     \centering
     $\vcenter{
-    \includegraphics[scale=0.3]{data/330px-Eigenfaces.png}
+    \includegraphics[scale=0.3]{data/eigenfaces.png}
     }$
     \end{minipage}
 \end{frame}
 
 
 \section{Autoencoder}
-\subsection{Autoencoder}
-\begin{frame}{}
+\subsection{Autoencoder architecture}
+\begin{frame}{Autoencoder architecture}
     Autoencoder is a specific neural network architecture composed of:
     \begin{enumerate}
-        \item an encoder network $f$ of arbitrary layers
+	\item an encoder network $f = \underset{i \in {{1 .. e}}}{O} L_i$
         \item a latent vector $h$
-        \item a decoder network $g$ of arbitrary layers
+	\item a decoder network $g = \underset{i \in {{e + 1 .. d + e}}}{O} L_i$
     \end{enumerate}
+    With $L_i : x \rightarrow \sigma(W_i.x + b)$ \\
     Where the input of the encoder has exactly the same dimensionality as the output of the decoder. \\
     \begin{minipage}{6in}
     \centering
@@ -129,22 +131,44 @@
     \end{minipage}
 \end{frame}
 
-\subsection{Equivalence with PCA}
-\begin{frame}{}
+\subsection{Autoencoder optimization}
+\begin{frame}{Autoencoder optimization}
+	\begin{itemize}
+		\item The output must reconstruct the input while having a bottleneck
+		\item $(W_i)_{i \in {1 .. e+d}} = \underset{(W_i)_{i \in {1 .. e+d}}}{argmin} \norm{ x - f \circ g(x)}_f$
+		\item Optimization is done using backpropagation algorithm
+	\end{itemize}
 \end{frame}
 
-\subsection{Another Subsection}
+\subsection{Similarities with PCA}
+\begin{frame}{Similarities with PCA}
+	A linear autoencoder with one hidden layer is close to PCA\\
+	We can rewrite $ f \circ g (x)$ as $A.B.x$ or $C.x$ with $C = A.B$\\
+	then we want to optimize $\norm{ Y - C.X)}_f$ \\ 
+	if $B = A^{t}$ we have $\norm{A^{t}.A - Y}_f = \norm{ P^t \Delta P. X - X}_f => ... $
+\end{frame}
 
-\begin{frame}{Blocks}
-\begin{block}{Block Title}
-You can also highlight sections of your presentation in a block, with it's own title
-\end{block}
-\begin{theorem}
-There are separate environments for theorems, examples, definitions and proofs.
-\end{theorem}
-\begin{example}
-Here is an example of an example block.
-\end{example}
+\begin{frame}{Similarities with PCA}
+    \includegraphics[scale=0.4]{data/pca_vs_autoencoder_bullshit1.png}
+\end{frame}
+
+\begin{frame}{Similarities with PCA}
+    \includegraphics[scale=0.4]{data/pca_vs_autoencoder_bullshit2.png}
+\end{frame}
+
+\begin{frame}{Similarities with PCA}
+	\begin{itemize}
+		\item PCA : M' = S.M  
+		\item AE : X = B.h
+	\end{itemize}
+We have close minimization objectives but orthogonality of $h$ is never ensured.
+\end{frame}
+
+\section{Variational Autoencoder}
+\subsection{A Bayesian point of view}
+\begin{frame}{Variational Autoencoder - A Bayesian point of view}
+	We not only want to map one element to it's simbling with reduced representation, we want to learn distribution of the data
+	$ p(x_1, x_2, ..., x_n) = p(x_1).p(x_2)...p(x_n)$
 \end{frame}
 
 % Placing a * after \section means it will not show in the

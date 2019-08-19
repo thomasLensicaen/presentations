@@ -162,13 +162,18 @@
 		\item AE : X = B.h
 	\end{itemize}
 We have close minimization objectives but orthogonality of $h$ is never ensured.
+% dimensions in the projected subspace are totally uncorrelated in the first space
+%
 \end{frame}
 
 \section{Variational Autoencoder}
 \subsection{A Bayesian point of view}
 \begin{frame}{Variational Autoencoder - A Bayesian point of view}
 	We not only want to map one element to it's simbling with reduced representation, we want to learn distribution of the data
-	$ p(x_1, x_2, ..., x_n) = p(x_1).p(x_2)...p(x_n)$
+	$ p(x) = \int_\Omega p(x|t)p(t) dt$  \\
+	With assumption: $p(t) = \mathcal{N}(0, I)$, 
+	$ p(x| t) = \mathcal{N}(\mu(t),\,\Sigma(t))$ 
+	
 \end{frame}
 
 % Placing a * after \section means it will not show in the

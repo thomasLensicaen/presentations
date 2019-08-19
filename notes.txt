@@ -1,0 +1,8 @@
+Idee de presentation
+
+* Decrire la PCA
+* equivalence PCA <=> Encoder
+* Simple autoencoder => Variational Autoencoder => Disentangled
+* Data generation => no interpolation 
+* Autoencoder asset pricing 
+* Inter-machin specialisation

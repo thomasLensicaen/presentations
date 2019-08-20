@@ -50,7 +50,7 @@
 \newcommand{\reels}{\mathbb{R}}
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 
-\title{Autoencoder a dimension reduction tool}
+\title{Autoencoder a dimensionality reduction tool}
 
 
 \author{Thomas LOUIS}
@@ -159,7 +159,7 @@
 \begin{frame}{Similarities with PCA}
 	\begin{itemize}
 		\item PCA : M' = S.M  
-		\item AE : X = B.h
+		\item AE : H = A.X
 	\end{itemize}
 We have close minimization objectives but orthogonality of $h$ is never ensured.
 % dimensions in the projected subspace are totally uncorrelated in the first space
@@ -169,11 +169,80 @@ We have close minimization objectives but orthogonality of $h$ is never ensured.
 \section{Variational Autoencoder}
 \subsection{A Bayesian point of view}
 \begin{frame}{Variational Autoencoder - A Bayesian point of view}
-	We not only want to map one element to it's simbling with reduced representation, we want to learn distribution of the data
+	We not only want to map one element to it's simbling with reduced representation, we want to learn distribution of the data $p(X)$
 	$ p(x) = \int_\Omega p(x|t)p(t) dt$  \\
-	With assumption: $p(t) = \mathcal{N}(0, I)$, 
-	$ p(x| t) = \mathcal{N}(\mu(t),\,\Sigma(t))$ 
-	
+	With assumption over the prior: $p(t) = \mathcal{N}(0, I)$ \\
+	$ p(x| t) = \mathcal{N}(\mu(t),\,\Sigma(t))$ \\
+	\begin{itemize}
+		\item $ \mu(t) = NN_1(t)$
+		\item $ \Sigma(t) = NN_2(t)$
+	\end{itemize}
+	We want to compute $\underset{\omega}{argmax} p(x| \omega) = \int_\Omega p(x|t, \omega)p(t) dt$  \\
+\end{frame}
+
+\begin{frame}{Variational Autoencoder - A Bayesian point of view}
+	$\underset{\omega}{argmax} p(X|t, \omega) = \underset{\omega}{argmax} log(p(X| \omega))$ \\
+	$ log(p(X| \omega)) = \underset{i \in \{1..N\}}{\Sigma} log( \int_\Omega p(x_i, t | \omega) dt)$ \\ 
+	$ >= \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q(t) log( p(x_i, t | \omega)/q(t) dt)$ using Jensen inequality as log is concave\\
+	$ = \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q(t) log( p(x_i | \omega, t).p(t)/q(t) dt)$ \\
+	$ = \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q(t) log( p(x_i | \omega, t) dt) + \int_\Omega q(t)log(q(t)/p(t)) dt$ \\
+	$ = \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q(t) log( p(x_i | \omega, t) dt) + KL( q || p) $ \\
+	$ log(p(X|t, \omega)) >= L(\omega,q) $
+	We have a reconstruction loss term plus a KL divergence term
+\end{frame}
+
+\begin{frame}{Variational Autoencoder - A Bayesian point of view}
+	$ \underset{\omega}{argmax} p(X|t, \omega) >= L(\omega,q) $ \\
+        $ \underset{\omega,q}{argmax} L(\omega,q) $ \\
+	each object $x_i$ has its own variational distribution $q_i$ \\
+        $ \underset{\omega,q}{argmax} L(\omega,q_1, q_2, ... q_N) $ \\
+	We'll approximate each $q_i$ with a Gaussian distribution $q_i = \mathcal{N}(m_i,\,\sigma_i)$ \\
+	We use here the encoder to compute the latent distribution: \\
+	\begin{itemize}
+		\item $m_i = m(x_i, \phi)$
+		\item $\sigma_i = \sigma(x_i, \phi)$
+	\end{itemize}
+	Thus $\phi$ is our encoder that from the input, compute the corresponding latent value.
+\end{frame}
+
+\begin{frame}{Variational Autoencoder - A Bayesian point of view}
+    \begin{minipage}{6in}
+    \centering
+    $\vcenter{
+    \includegraphics[scale=0.4]{data/variational_autoencoder.png} \\
+    }$
+    \end{minipage}
+    $ L(\omega, \phi, X)= \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q_\phi(t) log( p(x_i | \omega, t) dt) + KL( q || p ) $
+\end{frame}
+
+
+\subsection{Optimization}
+\begin{frame}{Variational Autoencoder - Optimization}
+        $ L(\omega, \phi, X)= \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q_\phi(t) log( p(x_i | \omega, t) dt) + KL( q_\phi || p ) $\\
+	We now need to compute $\nabla L(\omega, \phi).$.\\
+	Experimentaly, this preforms poorly due to logartihm of probabilities that are very low at the beginning\\
+	What we do instead is to compute $\underset{\phi}{\nabla} L(\omega,\phi)$, by sampling $t_i$ \\
+	$t_i = m_i + \sigma_i * \epsilon_i$ \\
+	In order to be able to compute back propagation, we sample $\epsilon_i$ from  $\mathcal{N}(0,I)$
+\end{frame}
+
+\begin{frame}{Variational Autoencoder - Optimization}
+    \begin{minipage}{6in}
+    \centering
+    $\vcenter{
+    \includegraphics[scale=0.4]{data/variational_autoencoder_reparametrized.png} \\
+    }$
+    \end{minipage}
+\end{frame}
+
+\section{Disentangled Variational Autoencoder}
+\begin{frame}{Disentangled Variational Autoencoder}
+	Vanilla VAE isn't sufficient:
+	\begin{itemize}
+		\item There is not insurance about how relevant the latent space is built  
+		\item We want  
+	\end{itemize}
+	$ L(\omega, \phi, X)= \underset{i \in \{1..N\}}{\Sigma} \mathbb{E}_{q_\phi(t_i)} log( p(x_i | \omega, t_i)) + \beta KL( q_\phi || p ) $
 \end{frame}
 
 % Placing a * after \section means it will not show in the

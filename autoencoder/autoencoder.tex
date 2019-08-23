@@ -50,7 +50,7 @@
 \newcommand{\reels}{\mathbb{R}}
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 
-\title{Autoencoder a dimensionality reduction tool}
+\title{Autoencoder is more than a dimensionality reduction tool}
 
 
 \author{Thomas LOUIS}
@@ -206,10 +206,10 @@ We have close minimization objectives but orthogonality of $h$ is never ensured.
 \end{frame}
 
 \begin{frame}{Variational Autoencoder - A Bayesian point of view}
-    \begin{minipage}{6in}
+    \begin{minipage}{5in}
     \centering
     $\vcenter{
-    \includegraphics[scale=0.4]{data/variational_autoencoder.png} \\
+    \includegraphics[scale=0.3]{data/variational_autoencoder.png} \\
     }$
     \end{minipage}
     $ L(\omega, \phi, X)= \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q_\phi(t) log( p(x_i | \omega, t) dt) + KL( q || p ) $
@@ -227,10 +227,10 @@ We have close minimization objectives but orthogonality of $h$ is never ensured.
 \end{frame}
 
 \begin{frame}{Variational Autoencoder - Optimization}
-    \begin{minipage}{6in}
+    \begin{minipage}{5in}
     \centering
     $\vcenter{
-    \includegraphics[scale=0.4]{data/variational_autoencoder_reparametrized.png} \\
+    \includegraphics[scale=0.5]{data/variational_autoencoder_reparametrized.png} \\
     }$
     \end{minipage}
 \end{frame}
@@ -239,10 +239,33 @@ We have close minimization objectives but orthogonality of $h$ is never ensured.
 \begin{frame}{Disentangled Variational Autoencoder}
 	Vanilla VAE isn't sufficient:
 	\begin{itemize}
-		\item There is not insurance about how relevant the latent space is built  
-		\item We want  
+		\item No insurrance about how meaningfull/relevant latent space is 
+		\item No insurrance about how the autoencoder can generalize over new data 
 	\end{itemize}
 	$ L(\omega, \phi, X)= \underset{i \in \{1..N\}}{\Sigma} \mathbb{E}_{q_\phi(t_i)} log( p(x_i | \omega, t_i)) + \beta KL( q_\phi || p ) $
+\end{frame}
+
+\begin{frame}{Disentangled Variational Autoencoder}
+    \begin{minipage}{5in}
+    \centering
+    $\vcenter{
+    \includegraphics[scale=0.4]{data/disentanglement.png} \\
+    }$
+    \end{minipage}
+\end{frame}
+
+
+\begin{frame}{Disentangled Variational Autoencoder}
+\end{frame}
+
+
+\begin{frame}{Disentangled Variational Autoencoder}
+    \begin{minipage}{5in}
+    \centering
+    $\vcenter{
+    \includegraphics[scale=0.4]{data/wwae.png} \\
+    }$
+    \end{minipage}
 \end{frame}
 
 % Placing a * after \section means it will not show in the

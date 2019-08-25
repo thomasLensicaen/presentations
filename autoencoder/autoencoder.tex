@@ -84,19 +84,24 @@
 \begin{frame}{Dimensionality reduction}{Optional Subtitle}
     Reducing dimensionality has several applications:
     \begin{itemize}
-	    \item compressing data
 	    \item coping with dimensionality curse
-            \item denoising
+	    \item compressing data
     \end{itemize}
 \end{frame}
 
 \subsection{The PCA case}
 \begin{frame}{The PCA case}
     Let's $M$ a ${N, d}$ matrix  of N vector $\in \reels^{d}$\\
-    We wan't to find a projection base of subspace where variance of M is maximal \\
-    $\hat{M}$ is the centred, normalized matrix of M \\
-    $\hat{M}.\hat{M}'$ is diagonalizable thus $\hat{M}.\hat{M}' = P^{t}.\Delta.P$ \\
+    M reprents N individuals that present $d$ quantitative variables \\
+    We wan't to find iteratively an orthogonal projection base $\mathbf{b}$ for M where the vector projects maximal variance and are ordered by this variance \\
+    let $\mathbf{u}$ be the first vector of $\mathbf{b}$ \\
+    $\hat{M}$ is the centred, standardized matrix of M \\
+    $\hat{M}.\hat{M}^{t}$ is symetric and positive thus diagonalizable : $\hat{m}.\hat{m}^{t} = P^{t}.\Delta.P$ \\
+    $u.\hat{M} . (u\hat{M})^{t} = u.\hat{M}.\hat{M}^{t}u{t}$ \\
+    $ = u. P^{t}.\Delta.P. u^{t} $
+
     $\Delta$ contains eigen vectors and P is the projection matrix for its eigenspace \\
+
     We only keep the eigen vectors that explain the most of the variance of M. \\
 \end{frame}
 
@@ -169,8 +174,9 @@ We have close minimization objectives but orthogonality of $h$ is never ensured.
 \section{Variational Autoencoder}
 \subsection{A Bayesian point of view}
 \begin{frame}{Variational Autoencoder - A Bayesian point of view}
-	We not only want to map one element to it's simbling with reduced representation, we want to learn distribution of the data $p(X)$
-	$ p(x) = \int_\Omega p(x|t)p(t) dt$  \\
+    We not only want to map one element to it's simbling with reduced representation.
+    We want to learn distribution of the data $\mathbf{p(X)}$ \\
+    $ \mathbf{p(x)} = \int_\Omega p(x|t)p(t) dt$  \\
 	With assumption over the prior: $p(t) = \mathcal{N}(0, I)$ \\
 	$ p(x| t) = \mathcal{N}(\mu(t),\,\Sigma(t))$ \\
 	\begin{itemize}
@@ -256,17 +262,24 @@ We have close minimization objectives but orthogonality of $h$ is never ensured.
 
 
 \begin{frame}{Disentangled Variational Autoencoder}
-\end{frame}
-
-
-\begin{frame}{Disentangled Variational Autoencoder}
+    A very important experimental result: \\
     \begin{minipage}{5in}
     \centering
     $\vcenter{
     \includegraphics[scale=0.4]{data/wwae.png} \\
     }$
     \end{minipage}
+    Image of the decoder is connexe inside the space of the target 
 \end{frame}
+
+\section{}
+\begin{frame}{Disentangled Variational Autoencoder}
+\end{frame}
+
+
+\begin{frame}{Disentangled Variational Autoencoder}
+\end{frame}
+
 
 % Placing a * after \section means it will not show in the
 % outline or table of contents.

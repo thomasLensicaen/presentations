@@ -11,6 +11,7 @@
 % notice. 
 
 \documentclass{beamer}
+\setbeamertemplate{bibliography item}[text]
 
 % There are many different themes available for Beamer. A comprehensive
 % list with examples is given here:
@@ -46,11 +47,26 @@
 %\usetheme{Warsaw}
 
 \usepackage{amsmath}
+\usepackage[style=verbose,backend=biber]{biblatex}
+\addbibresource{\jobname.bib}
 
 \newcommand{\reels}{\mathbb{R}}
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 
 \title{Autoencoder is more than a dimensionality reduction tool}
+
+\usepackage{filecontents}
+\begin{filecontents}{\jobname.bib}
+@TECHREPORT{RePEc:cwl:cwldpp:159,
+    title = {A six-factor asset pricing model},
+    author = {Rahul Roy, Santhakumar Shijin},
+    year = {2018},
+    institution = {Borsa Istanbul Review},
+    type = {Cowles Foundation Discussion Papers},
+    url = {https://hal.archives-ouvertes.fr/hal-01878923/document}
+}
+\end{filecontents}
+
 
 
 \author{Thomas LOUIS}
@@ -266,19 +282,33 @@ We have close minimization objectives but orthogonality of $h$ is never ensured.
     \begin{minipage}{5in}
     \centering
     $\vcenter{
-    \includegraphics[scale=0.4]{data/wwae.png} \\
+    \includegraphics[scale=0.3]{data/wwae.png} \\
     }$
     \end{minipage}
     Image of the decoder is connexe inside the space of the target 
 \end{frame}
 
-\section{}
-\begin{frame}{Disentangled Variational Autoencoder}
+\section{Using autoencoder for pricing}
+\subsection{Asset returns model}
+\begin{frame}{Asset returns model}
+	A common model for asset return is a linear K-factor model : \\
+	$r_{i,t} = \Beta{z_{i,t - 1}}^{t}.f_t + u_{i,t}$ \\
+	where $\Beta$ is a function over asset caracteristics high dimensional vector $z_i$ of size $(L, 1)$, at time t-1.
+	$f_t$ is a latent vector. $u_{i,t}$ is an idiosyncratic error vector. \\
+	\\
+	Problem statement : "Find $\Beta$, $\f_t$, that fit the model".
+\end{frame}
+
+\begin{frame}{Asset returns model}
+	
 \end{frame}
 
 
 \begin{frame}{Disentangled Variational Autoencoder}
 \end{frame}
+
+ \begin{frame}
+ \end{frame} 
 
 
 % Placing a * after \section means it will not show in the

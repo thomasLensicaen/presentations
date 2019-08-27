@@ -187,6 +187,46 @@ We have close minimization objectives but orthogonality of $h$ is never ensured.
 %
 \end{frame}
 
+
+\section{Using autoencoder for pricing}
+\subsection{Asset returns model}
+\begin{frame}{Asset returns model}
+	A common model for asset return is a linear K-factor model : \\
+    $r_{i,t} = \beta z_{i,t - 1}^{t}.f_t + u_{i,t}$ \\
+    $R = \beta^t.F + U$
+	where $\beta$ is a function over asset caracteristics high dimensional vector $z_i$ of size $(L, 1)$, at time t-1.
+	$f_t$ is a latent vector. $u_{i,t}$ is an idiosyncratic error vector. \\
+	Find $\beta$, $f_t$, that fit the model.
+\end{frame}
+
+\subsection{PCA view}
+\begin{frame}{Asset returns model}
+    let's define our autoencoder architecture iteratively: \\
+    for each layer $l$ we have the output $r^{l}$ : \\
+    $r^{l} = g(b^{l-1} + r^{l-1}.W^{l-1}$
+    we want to optimize the parameter for the loss $L$.
+    $\hat{W},\hat{b} = \underset{W,b}{argmin} \underset{i=1..T}{\Sigma} \norm{r_t - (b^{1} + W^{1}.(b^{0} + W^{0}. r_t}$ \\
+    For a 1 hidden layer autoencoder, with identity as activation function. one optimal solution is the solution of a PCA. \\
+    \begin{itemize}
+        \item $\hat{W}^{1} = P.A$ where P is defined by $R = P.\Lambda.Q + U$ and A is a non-singular matrix \\
+        \item $\hat{W}^{0} = (\hat{W}^{1}^{T}.\hat{W}^{1})^{-1}.\hat{W}^{1}^t$ \\
+        \item $\hat{b}^{1} = R - (\hat{W}^{1}.\hat{b}^{0} - \hat{W}^{1}).\hat{W}^{0}.R$ \\
+        \item $\hat{b}^{0} = c$, c is a constant
+    \end{itemize}
+\end{frame}
+
+
+\subsection{Adding covariates}
+\begin{frame}{Asset returns model}
+    We want to create both latent vectors and add covariates
+    \begin{minipage}{5in}
+    \centering
+    $\vcenter{
+    \includegraphics[scale=0.3]{data/ConditionalAE.png} \\
+    }$
+    \end{minipage}
+\end{frame}
+
 \section{Variational Autoencoder}
 \subsection{A Bayesian point of view}
 \begin{frame}{Variational Autoencoder - A Bayesian point of view}
@@ -264,6 +304,7 @@ We have close minimization objectives but orthogonality of $h$ is never ensured.
 		\item No insurrance about how meaningfull/relevant latent space is 
 		\item No insurrance about how the autoencoder can generalize over new data 
 	\end{itemize}
+    \bf{Disentangled Variational Autoencoder}
 	$ L(\omega, \phi, X)= \underset{i \in \{1..N\}}{\Sigma} \mathbb{E}_{q_\phi(t_i)} log( p(x_i | \omega, t_i)) + \beta KL( q_\phi || p ) $
 \end{frame}
 
@@ -285,64 +326,72 @@ We have close minimization objectives but orthogonality of $h$ is never ensured.
     \includegraphics[scale=0.3]{data/wwae.png} \\
     }$
     \end{minipage}
-    Image of the decoder is connexe inside the space of the target 
-\end{frame}
-
-\section{Using autoencoder for pricing}
-\subsection{Asset returns model}
-\begin{frame}{Asset returns model}
-	A common model for asset return is a linear K-factor model : \\
-	$r_{i,t} = \Beta{z_{i,t - 1}}^{t}.f_t + u_{i,t}$ \\
-	where $\Beta$ is a function over asset caracteristics high dimensional vector $z_i$ of size $(L, 1)$, at time t-1.
-	$f_t$ is a latent vector. $u_{i,t}$ is an idiosyncratic error vector. \\
-	\\
-	Problem statement : "Find $\Beta$, $\f_t$, that fit the model".
-\end{frame}
-
-\begin{frame}{Asset returns model}
-	
+    linear combination of two latent variable as a decoder image included in the space of the target 
 \end{frame}
 
 
-\begin{frame}{Disentangled Variational Autoencoder}
-\end{frame}
-
- \begin{frame}
- \end{frame} 
-
-
-% Placing a * after \section means it will not show in the
-% outline or table of contents.
-\section*{Summary}
-
-\begin{frame}{Summary}
-  \begin{itemize}
-  \item
-    The \alert{first main message} of your talk in one or two lines.
-  \item
-    The \alert{second main message} of your talk in one or two lines.
-  \item
-    Perhaps a \alert{third message}, but not more than that.
-  \end{itemize}
-  
-  \begin{itemize}
-  \item
-    Outlook
+\subsection{VAE Applications}
+\begin{frame}{VAE Applications}
+    We don't really have p(x).\\
+    But what if the reconstruction error expoldes when we set $x_0$ as input of the encoder ? \\
+    We've just spotted an anomaly !!!
+    This is a really widely used strategy for anomaly detection with many applications:
     \begin{itemize}
-    \item
-      Something you haven't solved.
-    \item
-      Something else you haven't solved.
+        \item e-transaction fraud detection
+        \item anomaly market
+        \item price anomaly
     \end{itemize}
-  \end{itemize}
+\end{frame} 
+
+\section{How to use an Autoencoder ?}
+\begin{frame}{How to use an Autoencoder ?}
+    Just create a model with many neurons and fit it to the data
+\end{frame}
+
+\begin{frame}{How to use an Autoencoder ?}
+    Just create a model with many neurons and fit it to the data ...
+\end{frame}
+
+\begin{frame}{How to use an Autoencoder ?}
+    Just create a model with many neurons and fit it to the data ... NO
+\end{frame}
+
+\begin{frame}{How to use an Autoencoder ?}
+    Problems:
+    \begin{itemize}
+        \item High Dimensionaity Curse
+        \item Hyperparameter sensitivity 
+        \item Black boxes 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{How to use an Autoencoder ?}
+    Solutions:
+    \begin{itemize}
+        \item High Dimensionaity Curse $\rightarrow$ break dimensionality with your human prior
+        \item Hyperparameter sensitivity $\rightarrow$ Optimization and rule of thumb 
+        \item Black boxes  $\rightarrow$ Validate your model with model explaination
+    \end{itemize}
+\end{frame}
+
+\section{Conclusion}
+\begin{frame}{Conclusion}
+    Autoencoders are powerfull tools to reduce data dimension and retain meaningfull information from dataset.
+    They profit from UAT as they belong to neural network
+    They became state of the art model and model component for many applications in many industries including finance.
+\end{frame}
+
+\section{To go further}
+\begin{frame}{To go further}
+\begin{itemize}
+        \item Generative Adversarial Network
+        \item Lattent embedding sharing
+        \item Consciouness
+\end{itemize}
 \end{frame}
 
 
 
-% All of the following is optional and typically not needed. 
-\appendix
-\section<presentation>*{\appendixname}
-\subsection<presentation>*{For Further Reading}
 
 \begin{frame}[allowframebreaks]
   \frametitle<presentation>{For Further Reading}

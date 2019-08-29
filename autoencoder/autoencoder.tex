@@ -168,11 +168,12 @@
 		\item ability to approximate any couple of continuos funcion $(f,g)$ over a compact couple
 		\item ability to deal with non linear problems
 		\item prediction is done at constant computational cost
-		\item ability to optimize different metrics with some assumptions 
+		\item ability to optimize different metrics with some assumptions
+		\item either supervised or unsupervised approach
 	\end{itemize}
 	autoencoder are meta-architecture that can compose with neural network to specialize to data
 	\begin{itemize}
-		\item CNN for images 
+		\item CNN, ResNet for images 
 		\item RNN for sequential data
 		\item GCN for graphs
 	\end{itemize}
@@ -288,12 +289,15 @@ We have close minimization objectives but orthogonality of $h$ is never ensured.
 
 \begin{frame}{Variational Autoencoder - A Bayesian point of view}
 	$\underset{\omega}{argmax} p(X|t, \omega) = \underset{\omega}{argmax} log(p(X| \omega))$ \\
-	$ log(p(X| \omega)) = \underset{i \in \{1..N\}}{\Sigma} log( \int_\Omega p(x_i, t | \omega) dt)$ \\ 
-	$ >= \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q(t) log( p(x_i, t | \omega)/q(t) dt)$ using Jensen inequality as log is concave\\
-	$ = \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q(t) log( p(x_i | \omega, t).p(t)/q(t) dt)$ \\
-	$ = \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q(t) log( p(x_i | \omega, t) dt) + \int_\Omega q(t)log(q(t)/p(t)) dt$ \\
-	$ = \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q(t) log( p(x_i | \omega, t) dt) + KL( q || p) $ \\
-	$ log(p(X|t, \omega)) >= L(\omega,q) $
+	$ log(p(X| \omega)) = \underset{i \in \{1..N\}}{\Sigma} log( \int_\Omega p(x_i, t | \omega))dt$ \\ 
+	$ >= \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q(t) log( p(x_i, t | \omega)/q(t))dt$ using Jensen inequality as log is concave\\
+	$ = ELOB(w)$ \\
+\end{frame}
+\begin{frame}{Variational Autoencoder - A Bayesian point of view}
+	$ = \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q(t) log( p(x_i | \omega, t).p(t)/q(t))dt$ \\
+	$ = \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q(t) log( p(x_i | \omega, t))dt + \int_\Omega q(t)log(q(t)/p(t)) dt$ \\
+	$ = \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q(t) log( p(x_i | \omega, t))dt + KL( q || p) $ \\
+	$ log(p(X|t, \omega)) >= ELOB(\omega,q) $
 	We have a reconstruction loss term plus a KL divergence term
 \end{frame}
 
@@ -377,14 +381,16 @@ We have close minimization objectives but orthogonality of $h$ is never ensured.
 
 \subsection{VAE Applications}
 \begin{frame}{VAE Applications}
-    We don't really have p(x).\\
-    But what if the reconstruction error expoldes when we set $x_0$ as input of the encoder ? \\
+    We don't really have p(x), but it is learned into the VAE.\\
+    What if the reconstruction error expoldes when we set $x_0$ as input of the encoder ? \\
     We've just spotted an anomaly !!!
     This is a really widely used strategy for anomaly detection with many applications:
     \begin{itemize}
         \item e-transaction fraud detection
         \item anomaly market
         \item price anomaly
+	\item beyond entropy compression
+	\item segmentation
     \end{itemize}
 \end{frame} 
 
@@ -415,14 +421,23 @@ We have close minimization objectives but orthogonality of $h$ is never ensured.
     \begin{itemize}
         \item High Dimensionaity Curse $\rightarrow$ break dimensionality with your human prior
         \item Hyperparameter sensitivity $\rightarrow$ Optimization and rule of thumb 
-        \item Black boxes  $\rightarrow$ Validate your model with model explaination
+        \item Black boxes $\rightarrow$ Validate your model with model explaination
     \end{itemize}
+\end{frame}
+
+\begin{frame}{Examples}
+    \begin{minipage}{5in}
+    \centering
+    $\vcenter{
+    \includegraphics[scale=0.4]{data/cnn_autoencoder.png} \\
+    }$
+    \end{minipage}
+
 \end{frame}
 
 \section{Conclusion}
 \begin{frame}{Conclusion}
     Autoencoders are powerfull tools to reduce data dimension and retain meaningfull information from dataset.
-    They profit from UAT as they belong to neural network
     They became state of the art model and model component for many applications in many industries including finance.
 \end{frame}
 
@@ -433,34 +448,6 @@ We have close minimization objectives but orthogonality of $h$ is never ensured.
         \item Lattent embedding sharing
         \item Consciouness
 \end{itemize}
-\end{frame}
-
-
-
-
-\begin{frame}[allowframebreaks]
-  \frametitle<presentation>{For Further Reading}
-    
-  \begin{thebibliography}{10}
-    
-  \beamertemplatebookbibitems
-  % Start with overview books.
-
-  \bibitem{Author1990}
-    A.~Author.
-    \newblock {\em Handbook of Everything}.
-    \newblock Some Press, 1990.
- 
-    
-  \beamertemplatearticlebibitems
-  % Followed by interesting articles. Keep the list short. 
-
-  \bibitem{Someone2000}
-    S.~Someone.
-    \newblock On this and that.
-    \newblock {\em Journal of This and That}, 2(1):50--100,
-    2000.
-  \end{thebibliography}
 \end{frame}
 
 \end{document}

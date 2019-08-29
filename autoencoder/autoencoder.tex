@@ -291,21 +291,21 @@ We have close minimization objectives but orthogonality of $h$ is never ensured.
 	$\underset{\omega}{argmax} p(X|t, \omega) = \underset{\omega}{argmax} log(p(X| \omega))$ \\
 	$ log(p(X| \omega)) = \underset{i \in \{1..N\}}{\Sigma} log( \int_\Omega p(x_i, t | \omega))dt$ \\ 
 	$ >= \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q(t) log( p(x_i, t | \omega)/q(t))dt$ using Jensen inequality as log is concave\\
-	$ = ELOB(w)$ \\
+	$ = ELBO(w)$ \\
 \end{frame}
 \begin{frame}{Variational Autoencoder - A Bayesian point of view}
 	$ = \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q(t) log( p(x_i | \omega, t).p(t)/q(t))dt$ \\
 	$ = \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q(t) log( p(x_i | \omega, t))dt + \int_\Omega q(t)log(q(t)/p(t)) dt$ \\
 	$ = \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q(t) log( p(x_i | \omega, t))dt + KL( q || p) $ \\
-	$ log(p(X|t, \omega)) >= ELOB(\omega,q) $
+	$ log(p(X|t, \omega)) >= ELBO(\omega,q) $
 	We have a reconstruction loss term plus a KL divergence term
 \end{frame}
 
 \begin{frame}{Variational Autoencoder - A Bayesian point of view}
-	$ \underset{\omega}{argmax} p(X|t, \omega) >= L(\omega,q) $ \\
-        $ \underset{\omega,q}{argmax} L(\omega,q) $ \\
+	$ \underset{\omega}{argmax} p(X|t, \omega) >= ELBO(\omega,q) $ \\
+        $ \underset{\omega,q}{argmax} ELBO(\omega,q) $ \\
 	each object $x_i$ has its own variational distribution $q_i$ \\
-        $ \underset{\omega,q}{argmax} L(\omega,q_1, q_2, ... q_N) $ \\
+        $ \underset{\omega,q}{argmax} ELBO(\omega,q_1, q_2, ... q_N) $ \\
 	We'll approximate each $q_i$ with a Gaussian distribution $q_i = \mathcal{N}(m_i,\,\sigma_i)$ \\
 	We use here the encoder to compute the latent distribution: \\
 	\begin{itemize}
@@ -322,18 +322,36 @@ We have close minimization objectives but orthogonality of $h$ is never ensured.
     \includegraphics[scale=0.3]{data/variational_autoencoder.png} \\
     }$
     \end{minipage}
-    $ L(\omega, \phi, X)= \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q_\phi(t) log( p(x_i | \omega, t) dt) + KL( q || p ) $
+    $ ELBO(\omega, \phi, X)= \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q_\phi(t) log( p(x_i | \omega, t) dt) + KL( q || p ) $
 \end{frame}
 
 
 \subsection{Optimization}
 \begin{frame}{Variational Autoencoder - Optimization}
-        $ L(\omega, \phi, X)= \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q_\phi(t) log( p(x_i | \omega, t) dt) + KL( q_\phi || p ) $\\
-	We now need to compute $\nabla L(\omega, \phi).$.\\
+        $ ELBO(\omega, \phi, X)= \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q_\phi(t) log( p(x_i | \omega, t) dt) + KL( q_\phi || p ) $\\
+	We now need to compute $\nabla ELBO(\omega, \phi).$.\\
+\end{frame}
+
+\begin{frame}{Variational Autoencoder - Optimization}
+        $ ELBO(\omega, \phi, X)= \underset{i \in \{1..N\}}{\Sigma} \int_\Omega q_\phi(t) log( p(x_i | \omega, t) dt) + KL( q_\phi || p ) $\\
+	$\underset{\phi}{\nabla} ELBO(\omega, \phi, X) = \underset{i \in \{1..N\}}{\Sigma}\underset{\phi}{\nabla} Rloss(\omega, \phi, X) + KL(\omega, \phi, X) $ \\
+        $\underset{\phi}{\nabla} Rloss(\omega, \phi, X) = \underset{\phi}{\nabla} \underset{i \in \{1..N\}}{\Sigma}\int_\Omega q_\phi(t) log( p(x_i | \omega, t) dt)$ \\
+        $\underset{\phi}{\nabla} Rloss(\omega, \phi, X) = \underset{i \in \{1..N\}}{\Sigma} \int_\Omega \underset{\phi}{\nabla} q_\phi(t) log( p(x_i | \omega, t) dt)$ \\
+	$\underset{\phi}{\nabla} Rloss(\omega, \phi, X) = \underset{i \in \{1..N\}}{\Sigma} \int_\Omega \frac{q_\phi(t)}{q_\phi(t)}\underset{\phi}{\nabla} q_\phi(t) log( p(x_i | \omega, t) dt)$ \\
+        $\underset{\phi}{\nabla} log ( g(\phi)) = \frac{\underset{\phi}{\nabla} g(\phi)}{g(\phi)}$ thus $\underset{i \in \{1..N\}}{\Sigma} \int_\Omega q_\phi(t)\underset{\phi}{\nabla}log(q_\phi(t)) q_\phi(t) log( p(x_i | \omega, t) dt)$ \\
+\end{frame}
+
+\begin{frame}{Variational Autoencoder - Optimization}
+        $\underset{\phi}{\nabla} Rloss(\omega, \phi, X) =\underset{i \in \{1..N\}}{\Sigma} \int_\Omega q_\phi(t)\underset{\phi}{\nabla}log(q_\phi(t)) q_\phi(t) log( p(x_i | \omega, t) dt)$ \\
+	$\underset{\phi}{\nabla} Rloss(\omega, \phi, X) = \underset{i \in \{1..N\}}{\Sigma} \mathbb{E}_{q_\phi(t)} \underset{\phi}{\nabla} log(q_\phi(t)) .log( p(x_i | \omega, t)) $  
 	Experimentaly, this preforms poorly due to logartihm of probabilities that are very low at the beginning\\
-	What we do instead is to compute $\underset{\phi}{\nabla} L(\omega,\phi)$, by sampling $t_i$ \\
+	What we do instead is to compute $\underset{\phi}{\nabla} ELBO(\omega,\phi)$, by sampling $t_i$ \\
 	$t_i = m_i + \sigma_i * \epsilon_i$ \\
+\end{frame}
+
+\begin{frame}{Variational Autoencoder - Optimization}
 	In order to be able to compute back propagation, we sample $\epsilon_i$ from  $\mathcal{N}(0,I)$
+	$\underset{\phi}{\nabla} Rloss(\omega, \phi, X) = \underset{i \in \{1..N\}}{\Sigma} \mathbb{E}_{\epsilon_{i}} \underset{\phi}{\nabla} log(q_\phi(t_i)) .log( p(x_i | \omega, t_i)) $  
 \end{frame}
 
 \begin{frame}{Variational Autoencoder - Optimization}
